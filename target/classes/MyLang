@@ -1,9 +1,9 @@
 start
-    int num = (1+4)+5;
+    int num = 1;
     int i;
     num = -num;
     for (i=0; a < 10; i+1)
-        a = num;
+        
 
     if a < 12 then
         num = -15;

@@ -223,24 +223,22 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
     private void parseFor() {
         System.out.println("parseFor():  " + "for");
         numRow++;
+        getToken("(", Token.BRACKETS_OP);
         parseAssign();
-        getToken("to", Token.KEYWORD);
-        parseExpr();
-        getToken("by", Token.KEYWORD);
-        parseExpr();
-        getToken("while", Token.KEYWORD);
+        getToken(";", Token.OP_END);
         parseBoolExpr();
+        getToken(";", Token.OP_END);
+        parseExpr();
+        getToken(")", Token.BRACKETS_OP);
         parseStatementList();
-        getToken("rof", Token.KEYWORD);
     }
 
     private void parseIf() {
         System.out.println("parseIf():  " + "if");
         numRow++;
         parseBoolExpr();
-        getToken("{", Token.START_BLOCK);
+        getToken("then", Token.KEYWORD);
         parseStatementList();
-        getToken("}", Token.END_BLOCK);
     }
 
     private void parseBoolExpr() {
