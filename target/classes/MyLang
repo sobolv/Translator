@@ -1,0 +1,12 @@
+start
+    int num = (1+4)+5;
+    int i;
+    num = -num;
+    for (i=0; a < 10; i+1)
+        a = num;
+
+    if a < 12 then
+        num = -15;
+    fi
+     result = n * 5^2 + (a^2 - 10 - k) / 10
+end
