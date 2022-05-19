@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
+public class RecursiveSyntaxAnalyzer {
     private final List<String> startStatementSymbols;
     private final TableOfSymbols tableOfSymbols;
     private final Map<String, VarVal> mapOfVar;
@@ -30,8 +30,6 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
         startStatementSymbols.add("scan");
         startStatementSymbols.add("if");
     }
-
-    @Override
     public void parse() {
         try {
             getToken("start", Token.KEYWORD);
@@ -239,6 +237,7 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
         parseBoolExpr();
         getToken("then", Token.KEYWORD);
         parseStatementList();
+        getToken("fi", Token.KEYWORD);
     }
 
     private void parseBoolExpr() {
