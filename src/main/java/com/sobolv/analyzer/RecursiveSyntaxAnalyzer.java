@@ -18,7 +18,6 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
     private final TableOfSymbols tableOfSymbols;
     private final Map<String, VarVal> mapOfVar;
     private int numRow = 1;
-    public Map<Integer, Symbol> maps = new HashMap<>();
 
     public RecursiveSyntaxAnalyzer(TableOfSymbols tableOfSymbols, Map<String, VarVal> mapOfVar) {
         this.tableOfSymbols = tableOfSymbols;
@@ -120,17 +119,7 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
             parseExpr();
         }
     }
-    private void parseBrackets() {
-//        numRow++;
-        getToken("(", Token.BRACKETS_OP);
-        parseExpr();
-//        parseExprList();
-        getToken(")", Token.BRACKETS_OP);
 
-    }
-    private void parseExprList(){
-        parseExpr();
-    }
     private void parseExpr() {
         Symbol symbol = tableOfSymbols.get(numRow);
         System.out.println("parseExpr():  " + symbol.getLexeme());
@@ -149,20 +138,9 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
             if (symbol.getToken().equals(Token.REL_OP)) {
                 return;
             }
-            if (symbol.getToken().equals(Token.ADD_OP) || symbol.getToken().equals(Token.MULT_OP)) {
-                parseExpr();
-            }
             if (symbol.getToken().equals(Token.OP_END)) {
                 return;
             }
-        }
-        if(symbol.getLexeme().equalsIgnoreCase("(")){
-            parseBrackets();
-            numRow++;
-            parseExpr();
-
-        }else if(symbol.getLexeme().equalsIgnoreCase(")")){
-           return;
         }
         if (symbol.getToken().equals(Token.ADD_OP) || symbol.getToken().equals(Token.MULT_OP)) {
             numRow++;
@@ -183,11 +161,8 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
                 return;
             }
             checkNumbers();
-//            parseExpr();
             numRow++;
-            parseExpr();
         } else {
-//            return;
             throw new ParserException(symbol, ErrorType.STATELIST_MISMATCH, "ident or num");
         }
 
@@ -196,7 +171,6 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
             numRow++;
             return;
         }
-
     }
 
     private void checkNumbers() {
@@ -249,32 +223,33 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
     private void parseFor() {
         System.out.println("parseFor():  " + "for");
         numRow++;
-        getToken("(", Token.BRACKETS_OP);
         parseAssign();
-        getToken(";", Token.OP_END);
-        parseBoolExpr();
-        getToken(";", Token.OP_END);
+        getToken("to", Token.KEYWORD);
         parseExpr();
-        getToken(")", Token.BRACKETS_OP);
+        getToken("by", Token.KEYWORD);
+        parseExpr();
+        getToken("while", Token.KEYWORD);
+        parseBoolExpr();
         parseStatementList();
+        getToken("rof", Token.KEYWORD);
     }
 
     private void parseIf() {
         System.out.println("parseIf():  " + "if");
         numRow++;
         parseBoolExpr();
-        getToken("then", Token.KEYWORD);
+        getToken("{", Token.START_BLOCK);
         parseStatementList();
-        getToken("fi", Token.KEYWORD);
+        getToken("}", Token.END_BLOCK);
     }
 
     private void parseBoolExpr() {
         Symbol symbol = tableOfSymbols.get(numRow);
         System.out.println("parseBoolExpr():  " + symbol.getLexeme());
-//        if (symbol.getLexeme().equals("(")) {
-//            numRow++;
-//            symbol = tableOfSymbols.get(numRow);
-//        }
+        if (symbol.getLexeme().equals("(")) {
+            numRow++;
+            symbol = tableOfSymbols.get(numRow);
+        }
         if (!symbol.getToken().equals(Token.IDENT) &&
                 !symbol.getLexeme().equals("true") &&
                 !symbol.getLexeme().equals("false")) {
@@ -282,9 +257,9 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
         }
         parseRelation();
         symbol = tableOfSymbols.get(numRow);
-//        if (symbol.getLexeme().equals(")")) {
-//            numRow++;
-//        }
+        if (symbol.getLexeme().equals(")")) {
+            numRow++;
+        }
     }
 
     private void parseRelation() {
@@ -307,4 +282,3 @@ public class RecursiveSyntaxAnalyzer implements SyntaxAnalyzer {
         parseExpr();
     }
 }
-
