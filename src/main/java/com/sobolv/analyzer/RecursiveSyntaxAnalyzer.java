@@ -30,6 +30,7 @@ public class RecursiveSyntaxAnalyzer {
         startStatementSymbols.add("scan");
         startStatementSymbols.add("if");
     }
+
     public void parse() {
         try {
             getToken("start", Token.KEYWORD);
@@ -118,56 +119,64 @@ public class RecursiveSyntaxAnalyzer {
         }
     }
 
-    private void parseExpr() {
+    private void parseTerm() {
+        parseFactor();
         Symbol symbol = tableOfSymbols.get(numRow);
-        System.out.println("parseExpr():  " + symbol.getLexeme());
-        if (symbol.getLexeme().equals("-")) {
+        if (symbol.getToken().equals(Token.MULT_OP)) {
             numRow++;
+            parseFactor();
             symbol = tableOfSymbols.get(numRow);
         }
-        if (symbol.getLexeme().equalsIgnoreCase("scan")) {
-            getToken("scan", Token.KEYWORD);
-            parseScan();
-            return;
-        }
-        if (symbol.getToken().equals(Token.IDENT)) {
+        if (symbol.getToken().equals(Token.ADD_OP)) {
             numRow++;
-            symbol = tableOfSymbols.get(numRow);
-            if (symbol.getToken().equals(Token.REL_OP)) {
-                return;
-            }
-            if (symbol.getToken().equals(Token.OP_END)) {
-                return;
-            }
+            parseFactor();
         }
-        if (symbol.getToken().equals(Token.ADD_OP) || symbol.getToken().equals(Token.MULT_OP)) {
+    }
+
+    private void parseArithmExpr() {
+        parseTerm();
+        Symbol symbol = tableOfSymbols.get(numRow);
+        if (symbol.getToken().equals(Token.ADD_OP)) {
             numRow++;
             symbol = tableOfSymbols.get(numRow);
             if (!symbol.getToken().equals(Token.INTNUM) && !symbol.getToken().equals(Token.DOUBLENUM) &&
                     !symbol.getToken().equals(Token.IDENT) && !symbol.getLexeme().equals("-")) {
                 throw new ParserException(symbol, ErrorType.STATELIST_MISMATCH, "ident or num");
             }
-            parseExpr();
+            parseArithmExpr();
         }
-        if(tableOfSymbols.get(numRow).getToken().equals(Token.OP_END)){
-            return;
-        }
-        if (symbol.getToken().equals(Token.INTNUM)
-                || symbol.getToken().equals(Token.DOUBLENUM)) {
-            symbol = tableOfSymbols.get(numRow);
-            if (symbol.getToken().equals(Token.OP_END)) {
-                return;
-            }
-            checkNumbers();
-            numRow++;
-        } else {
-            throw new ParserException(symbol, ErrorType.STATELIST_MISMATCH, "ident or num");
-        }
+    }
 
-        symbol = tableOfSymbols.get(numRow);
+    private void parseFactor() {
+        Symbol symbol = tableOfSymbols.get(numRow);
         if (symbol.getToken().equals(Token.IDENT)) {
             numRow++;
-            return;
+        } else if (symbol.getToken().equals(Token.INTNUM) || symbol.getToken().equals(Token.DOUBLENUM)) {
+            checkNumbers();
+            numRow++;
+        } else if (symbol.getLexeme().equals("(")) {
+            numRow++;
+            parseArithmExpr();
+            getToken(")", Token.BRACKETS_OP);
+            symbol = tableOfSymbols.get(numRow);
+            if (symbol.getToken().equals(Token.MULT_OP) || symbol.getToken().equals(Token.ADD_OP)) {
+                parseTerm();
+            }
+        }
+    }
+
+    private void parseExpr() {
+        Symbol symbol = tableOfSymbols.get(numRow);
+        System.out.println("parseExpr():  " + symbol.getLexeme());
+        parseTerm();
+        symbol = tableOfSymbols.get(numRow);
+        if (symbol.getToken().equals(Token.ADD_OP)) {
+            numRow++;
+            parseTerm();
+        }
+        if (symbol.getToken().equals(Token.MULT_OP)) {
+            numRow++;
+            parseTerm();
         }
     }
 
