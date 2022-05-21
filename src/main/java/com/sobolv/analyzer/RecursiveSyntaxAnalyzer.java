@@ -88,7 +88,7 @@ public class RecursiveSyntaxAnalyzer {
         } else if (symbol.getToken().equals(Token.KEYWORD) && symbol.getLexeme().equals("scan")) {
             getToken("scan", Token.KEYWORD);
             parseScan();
-            getToken(";", Token.OP_END);
+//            getToken(";", Token.OP_END);
         } else if (symbol.getLexeme().equals("end")) {
             numRow++;
         }
@@ -163,6 +163,9 @@ public class RecursiveSyntaxAnalyzer {
                 parseTerm();
             }
         }
+//        else if (symbol.getToken().equals(Token.MULT_OP) || symbol.getToken().equals(Token.ADD_OP)){
+//            throw new ParserException(symbol, ErrorType.IDENT);
+//        }
     }
 
     private void parseExpr() {
@@ -170,6 +173,9 @@ public class RecursiveSyntaxAnalyzer {
         System.out.println("parseExpr():  " + symbol.getLexeme());
         parseTerm();
         symbol = tableOfSymbols.get(numRow);
+        if (symbol.getToken().equals(Token.KEYWORD)){
+            parseStatement();
+        }
         if (symbol.getToken().equals(Token.ADD_OP)) {
             numRow++;
             parseTerm();
