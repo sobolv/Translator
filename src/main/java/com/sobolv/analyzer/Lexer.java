@@ -3,7 +3,10 @@ package com.sobolv.analyzer;
 import com.sobolv.entity.State;
 import com.sobolv.entity.Symbol;
 import com.sobolv.entity.VarVal;
+import com.sobolv.enums.ErrorType;
 import com.sobolv.enums.Token;
+import com.sobolv.exception.LexerException;
+import com.sobolv.exception.ParserException;
 import com.sobolv.util.TableOfSymbols;
 import lombok.SneakyThrows;
 
@@ -57,23 +60,29 @@ public class Lexer {
 
     @SneakyThrows
     public void analyze(String path) {
-        readFile(path);
-        while (numChar < textCode.length() - 1) {
-            currentChar = nextChar();
+        try {
+            readFile(path);
+            while (numChar < textCode.length() - 1) {
+                currentChar = nextChar();
 
-            String classChar = defineChar(currentChar);
-            state = nextState(state, classChar);
-            if (isFinal(state)) {
-                processing();
-                if (errStates.contains(state)) {
-                    break;
+                String classChar = defineChar(currentChar);
+                state = nextState(state, classChar);
+                if (isFinal(state)) {
+                    processing();
+                    if (errStates.contains(state)) {
+                        break;
+                    }
+                } else if (state == 0) {
+                    lexeme = "";
+                } else {
+                    lexeme += currentChar;
                 }
-            } else if (state == 0) {
-                lexeme = "";
-            } else {
-                lexeme += currentChar;
             }
+        } catch (LexerException e) {
+            System.err.println(e);
+            System.exit(1);
         }
+
     }
 
     private void processing() {
@@ -101,13 +110,15 @@ public class Lexer {
             tableOfSymbols.add(new Symbol(numLine, lexeme, token, 0));
             lexeme = "";
             state = 0;
-        }else if (state == 101 || state == 102) {
+        }else if (state == 20) {
             token = getToken(state, lexeme);
             System.out.println(numLine + " " + lexeme + " " + token);
             tableOfSymbols.add(new Symbol(numLine, lexeme, token, 0));
             numChar = putCharBack(numChar);
             lexeme = "";
             state = 0;
+        }else if (state == 101) {
+            throw new LexerException(currentChar, ErrorType.LEXER, numLine);
         }
     }
 
@@ -222,7 +233,6 @@ public class Lexer {
     private void initErrStates() {
         errStates = new ArrayList<>();
         errStates.add(101);
-        errStates.add(102);
     }
 
     private void initFinalState() {
@@ -233,8 +243,8 @@ public class Lexer {
         finalStates.add(10);
         finalStates.add(17);
         finalStates.add(18);
+        finalStates.add(20);
         finalStates.add(101);
-        finalStates.add(102);
     }
 
     private void initMapOfStates() {
@@ -273,10 +283,10 @@ public class Lexer {
         mapOfStates.put(new State(0, ">"), 19);
         mapOfStates.put(new State(0, "<"), 19);
         mapOfStates.put(new State(19, "="), 18);
-        mapOfStates.put(new State(19, "other"), 102);
+        mapOfStates.put(new State(19, "other"), 20);
         mapOfStates.put(new State(0, "="), 16);
         mapOfStates.put(new State(16, "="), 17);
-        mapOfStates.put(new State(16, "other"), 102);
+        mapOfStates.put(new State(16, "other"), 20);
     }
 
     private Token getToken(int state, String lexeme) {
@@ -305,9 +315,10 @@ public class Lexer {
             res = "ws";
         } else if (str.equals("\n")) {
             res = "nl";
-        }
-        if ("+-*/=^E()><{},;:?".contains(str)) {
+        }else if ("+-*/=^E()><{},;:?".contains(str)) {
             res = str;
+        }else{
+            res = "other";
         }
         return res;
     }
