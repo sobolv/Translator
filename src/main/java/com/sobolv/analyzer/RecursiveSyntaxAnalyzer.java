@@ -8,7 +8,6 @@ import com.sobolv.exception.ParserException;
 import com.sobolv.util.TableOfSymbols;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,8 +26,8 @@ public class RecursiveSyntaxAnalyzer {
         startStatementSymbols.add("int");
         startStatementSymbols.add("double");
         startStatementSymbols.add("print");
-        startStatementSymbols.add("scan");
         startStatementSymbols.add("if");
+        startStatementSymbols.add("boolean");
     }
 
     public void parse() {
@@ -38,7 +37,7 @@ public class RecursiveSyntaxAnalyzer {
             getToken("end", Token.KEYWORD);
             System.out.println("Syntax Analyzer is ok");
         } catch (ParserException e) {
-            System.err.println(e.toString());
+            System.err.println(e);
         }
     }
 
@@ -85,10 +84,6 @@ public class RecursiveSyntaxAnalyzer {
             getToken("print", Token.KEYWORD);
             parsePrint();
             getToken(";", Token.OP_END);
-        } else if (symbol.getToken().equals(Token.KEYWORD) && symbol.getLexeme().equals("scan")) {
-            getToken("scan", Token.KEYWORD);
-            parseScan();
-//            getToken(";", Token.OP_END);
         } else if (symbol.getLexeme().equals("end")) {
             numRow++;
         }
@@ -102,8 +97,8 @@ public class RecursiveSyntaxAnalyzer {
 
     private void parsePrint() {
         getToken("(", Token.BRACKETS_OP);
-        //parseExpr();
-        numRow++;
+        parseExpr();
+//        numRow++;
         getToken(")", Token.BRACKETS_OP);
     }
 
@@ -120,30 +115,17 @@ public class RecursiveSyntaxAnalyzer {
     }
 
     private void parseTerm() {
+        boolean multFlag = true;
         parseFactor();
-        Symbol symbol = tableOfSymbols.get(numRow);
-        if (symbol.getToken().equals(Token.MULT_OP)) {
-            numRow++;
-            parseFactor();
+        Symbol symbol;
+        while (multFlag) {
             symbol = tableOfSymbols.get(numRow);
-        }
-        if (symbol.getToken().equals(Token.ADD_OP)) {
-            numRow++;
-            parseFactor();
-        }
-    }
-
-    private void parseArithmExpr() {
-        parseTerm();
-        Symbol symbol = tableOfSymbols.get(numRow);
-        if (symbol.getToken().equals(Token.ADD_OP)) {
-            numRow++;
-            symbol = tableOfSymbols.get(numRow);
-            if (!symbol.getToken().equals(Token.INTNUM) && !symbol.getToken().equals(Token.DOUBLENUM) &&
-                    !symbol.getToken().equals(Token.IDENT) && !symbol.getLexeme().equals("-")) {
-                throw new ParserException(symbol, ErrorType.STATELIST_MISMATCH, "ident or num");
+            if (symbol.getToken().equals(Token.MULT_OP)) {
+                numRow++;
+                parseFactor();
+            } else {
+                multFlag = false;
             }
-            parseArithmExpr();
         }
     }
 
@@ -156,33 +138,34 @@ public class RecursiveSyntaxAnalyzer {
             numRow++;
         } else if (symbol.getLexeme().equals("(")) {
             numRow++;
-            parseArithmExpr();
+            parseExpr();
             getToken(")", Token.BRACKETS_OP);
-            symbol = tableOfSymbols.get(numRow);
-            if (symbol.getToken().equals(Token.MULT_OP) || symbol.getToken().equals(Token.ADD_OP)) {
-                parseTerm();
-            }
+        } else {
+            throw new ParserException(symbol, ErrorType.IDENT);
         }
-//        else if (symbol.getToken().equals(Token.MULT_OP) || symbol.getToken().equals(Token.ADD_OP)){
-//            throw new ParserException(symbol, ErrorType.IDENT);
-//        }
     }
 
     private void parseExpr() {
+        boolean addFlag = true;
         Symbol symbol = tableOfSymbols.get(numRow);
         System.out.println("parseExpr():  " + symbol.getLexeme());
+        if (symbol.getLexeme().equals("scan")) {
+            numRow++;
+            parseScan();
+            return;
+        }
+        if (symbol.getLexeme().equals("-")) {
+            numRow++;
+        }
         parseTerm();
-        symbol = tableOfSymbols.get(numRow);
-        if (symbol.getToken().equals(Token.KEYWORD)){
-            parseStatement();
-        }
-        if (symbol.getToken().equals(Token.ADD_OP)) {
-            numRow++;
-            parseTerm();
-        }
-        if (symbol.getToken().equals(Token.MULT_OP)) {
-            numRow++;
-            parseTerm();
+        while (addFlag) {
+            symbol = tableOfSymbols.get(numRow);
+            if (symbol.getToken().equals(Token.ADD_OP)) {
+                numRow++;
+                parseTerm();
+            } else {
+                addFlag = false;
+            }
         }
     }
 

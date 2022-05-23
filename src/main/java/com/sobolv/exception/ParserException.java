@@ -46,7 +46,7 @@ public class ParserException extends RuntimeException {
                 break;
             case IDENT:
                 str = "ParserException: unexpected (" + symbol.getLexeme() + " " + symbol.getToken() + ") " +
-                        "on line " + symbol.getNumLine() + ", expected (IDENT)\n" + generate();
+                        "on line " + symbol.getNumLine() + ", expected (IDENT or CONST)\n" + generate();
                 break;
         }
         return str;

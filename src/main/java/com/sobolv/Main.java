@@ -14,8 +14,8 @@ public class Main {
     private static void lab1() {
         Lexer analyzer = new Lexer(TABLE_OF_SYMBOLS);
         analyzer.analyze("src/main/resources/MyLang");
-        RecursiveSyntaxAnalyzer syntaxAnalyzer = new RecursiveSyntaxAnalyzer(TABLE_OF_SYMBOLS, analyzer.getMapOfVar());
-        syntaxAnalyzer.parse();
+//        RecursiveSyntaxAnalyzer syntaxAnalyzer = new RecursiveSyntaxAnalyzer(TABLE_OF_SYMBOLS, analyzer.getMapOfVar());
+//        syntaxAnalyzer.parse();
     }
 
 }
