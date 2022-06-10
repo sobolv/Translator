@@ -1,6 +1,6 @@
 start
-   n = 1;
+   double n = 1;
+   n = 1 + 1.0;
    m = 1.0;
    m = m + 1 + m;
-
 end

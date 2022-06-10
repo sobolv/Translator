@@ -61,9 +61,12 @@ public class PostfixTranslator {
 
     private boolean parseStatement() {
         Symbol symbol = tableOfSymbols.get(numRow);
-        if (symbol.getLexeme().equalsIgnoreCase("double") ||
-                symbol.getLexeme().equalsIgnoreCase("int")) {
-            numRow++;
+        if (symbol.getLexeme().equalsIgnoreCase("int")){
+            parseInt();
+            return true;
+        }
+        if (symbol.getLexeme().equalsIgnoreCase("double")){
+            parseDouble();
             return true;
         }
         if (symbol.getToken().equals(Token.IDENT)) {
@@ -87,7 +90,16 @@ public class PostfixTranslator {
             throw new RuntimeException();
         }
     }
-
+    private void parseInt(){
+        numRow++;
+        Symbol symbol = tableOfSymbols.get(numRow);
+        Main.tableOfTypes.put(symbol.getLexeme(),"INTNUM");
+    }
+    private void parseDouble(){
+        numRow++;
+        Symbol symbol = tableOfSymbols.get(numRow);
+        Main.tableOfTypes.put(symbol.getLexeme(),"DOUBLENUM");
+    }
     private Symbol createLabel() {
         return new Symbol(numRow, "m" + labelCount++, Token.LABEL, mapOfLabel.size());
     }

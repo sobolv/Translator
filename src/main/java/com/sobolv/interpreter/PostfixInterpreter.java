@@ -63,11 +63,28 @@ public class PostfixInterpreter {
                 System.err.println("Variable is not initialized");
                 throw new RuntimeException();
             } else {
-                System.out.println(mapOfVar().get(toPrint.getLexeme()).getValue());
+                checkValue(toPrint);
             }
         } else {
-            System.out.println(mapOfConst().get(toPrint.getLexeme()).getValue());
+            if(mapOfConst().get(toPrint.getLexeme()).getValue() % 1 == 0){
+                int value = mapOfConst().get(toPrint.getLexeme()).getValue().intValue();
+                System.out.println(value);
+            }else{
+                System.out.println(mapOfConst().get(toPrint.getLexeme()).getValue());
+            }
         }
+    }
+    public void checkValue(Symbol s){
+            if(Main.tableOfTypes.get(s.getLexeme()).equals(Token.DOUBLENUM.toString())){
+                System.out.println(mapOfVar().get(s.getLexeme()).getValue());
+            }else if(Main.tableOfTypes.get(s.getLexeme()).equals(Token.INTNUM.toString())){
+                if(mapOfVar().get(s.getLexeme()).getValue() % 1 == 0){
+                    int value = mapOfVar().get(s.getLexeme()).getValue().intValue();
+                    System.out.println(value);
+                }else{
+                    System.out.println(mapOfVar().get(s.getLexeme()).getValue());
+                }
+            }
     }
 
     private void processScan() {
