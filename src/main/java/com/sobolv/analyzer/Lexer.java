@@ -1,5 +1,6 @@
 package com.sobolv.analyzer;
 
+import com.sobolv.Main;
 import com.sobolv.entity.State;
 import com.sobolv.entity.Symbol;
 import com.sobolv.entity.VarVal;
@@ -215,7 +216,7 @@ public class Lexer {
         mapOfLanguageTokens.put(";", Token.OP_END);
         mapOfLanguageTokens.put("{", Token.START_BLOCK);
         mapOfLanguageTokens.put("}", Token.END_BLOCK);
-        mapOfLanguageTokens.put("^", Token.MULT_OP);
+        mapOfLanguageTokens.put("^", Token.POW_OP);
     }
 
     private void initMaps() {
