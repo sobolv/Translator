@@ -1,0 +1,21 @@
+start
+   int n = 1.5;
+   print(n);
+   m = scan();
+   if m<10 then
+      m = 1;
+   fi
+   for(i=0;i<3;i+1){
+      n = n + m;
+      for(j=0;j<3;j+1){
+            n = n + m;
+            for(k=0;k<3;k+1){
+                        n = n + m;
+                        print(i);
+                        print(j);
+                        print(k);
+                     }
+         }
+   }
+   print(m);
+end

@@ -102,7 +102,7 @@ public class PostfixInterpreter {
             }
 
         } catch (Exception e) {
-            System.err.println("You can enter only numbers");
+            System.err.println("You can enter only 1 number");
             throw new RuntimeException();
         }
     }

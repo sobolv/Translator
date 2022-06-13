@@ -18,6 +18,7 @@ public class PostfixTranslator {
     private final TableOfSymbols tableOfSymbols;
 
     private int labelCount = 0;
+    private int rCount = 0;
     private int numRow = 1;
     private Lexer analyzer;
     private List<Symbol> postfixCode;
@@ -143,21 +144,20 @@ public class PostfixTranslator {
         postfixCode.add(m0);
         parseBoolExpression();
         getToken(";", Token.OP_END);
-        Symbol r1 = new Symbol(0, "r1", Token.IDENT, 0);
-        mapOfVar().put("r1", new VarVal(0, Token.IDENT, 1d));
+        Symbol r1 = new Symbol(0, "r"+rCount, Token.IDENT, 0);
+        mapOfVar().put("r"+rCount, new VarVal(0, Token.IDENT, 1d));
         postfixCode.add(r1);
+        rCount++;
         parseExpression();
         postfixCode.add(new Symbol(0, "=", Token.ASSIGN_OP, 0));
         getToken(")", Token.BRACKETS_OP);
         Symbol m1 = createLabel();
         mapOfLabel.put(m1.getLexeme(), postfixCode.size());
         postfixCode.add(m1);
-        //postfixCode.add(var);
-        //postfixCode.add(new Symbol(0, "<", Token.REL_OP, 0));
         postfixCode.add(new Symbol(numRow, "JF", null, 0));
-//        getToken("{", Token.START_BLOCK);
+        getToken("{", Token.START_BLOCK);
         parseStatementList();
-//        getToken("}", Token.END_BLOCK);
+        getToken("}", Token.END_BLOCK);
         postfixCode.add(symbol);
         postfixCode.add(r1);
         postfixCode.add(new Symbol(0, "=", Token.ASSIGN_OP, 0));

@@ -1,7 +1,8 @@
 start
-   double n = 1;
-   n = 1 + 1.0;
-   m = 1.0;
-   m = m + 1 + m;
-   print(n+2.5);
+   int n = 1;
+   t = 2;
+   double i = 8;
+   k = 1.9;
 end
+
+
